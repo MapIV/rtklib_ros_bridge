@@ -2,7 +2,7 @@
 
 ## Overview
 
-rtklib_ros_bridge is a package that outputs the latitude and longitude, satellite reception status, altitude, ECEF xyz, ECEF velocity vector, and Time of Week (GPS Time) calculated by RTKLIB as ROS messages.
+rtklib_ros_bridge is a package that outputs the latitude and longitude, satellite reception status, altitude, ecef xyz, ecef velocity vector, and Time of Week (GPS Time) calculated by RTKLIB as ROS messages.
 
 ## Install
 

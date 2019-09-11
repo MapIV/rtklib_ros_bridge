@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  kinetic:
+    docker:
+      - image: ros:kinetic
+
+    working_directory: ~/rtklib_ros_bridge
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install catkin
+          command: |
+            apt-get update -qq && apt-get install -y python-catkin-tools
+            source /opt/ros/kinetic/setup.bash
+            rosdep install --from-paths src --ignore-src -y --rosdistro kinetic
+
+      - run:
+          name: Build
+          command: |
+            source /opt/ros/kinetic/setup.bash
+            mkdir -p /tmp/ws/src
+            ln -s `pwd` /tmp/ws/src/package
+            cd /tmp/ws/src
+            catkin_init_workspace
+            cd ../
+            catkin_make -DCMAKE_BUILD_TYPE=Release -j1
+
+workflows:
+  version: 2
+  ros_build:
+    jobs:
+      - kinetic

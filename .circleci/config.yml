@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: ros:kinetic
 
-    working_directory: ~/rtklib_ros_bridge
+    working_directory: ~/rtklib_ros_bridge/rtklib_bridge
 
     steps:
       - checkout

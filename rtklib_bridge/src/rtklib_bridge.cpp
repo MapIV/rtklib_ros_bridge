@@ -24,7 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
- * rtklib_ros_bridge.cpp
+ * rtklib_bridge.cpp
  * Program for connecting with RTKLIB
  * Author MapIV Sekino
  * Ver 1.00 2019/3/6
@@ -32,7 +32,7 @@
  */
 
 #include "ros/ros.h"
-#include "rtklib_ros_bridge/rtklib_msgs.h"
+#include "rtklib_msgs/RtklibNav.h"
 #include "sensor_msgs/NavSatFix.h"
 #include <stdio.h>
 #include <sys/types.h>
@@ -44,12 +44,12 @@
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "rtklib_ros_bridge");
+  ros::init(argc, argv, "rtklib_bridge");
   ros::NodeHandle n;
-  ros::Publisher pub1 = n.advertise<rtklib_ros_bridge::rtklib_msgs>("/rtklib_nav", 1);
+  ros::Publisher pub1 = n.advertise<rtklib_msgs::RtklibNav>("/rtklib_nav", 1);
   ros::Publisher pub2 = n.advertise<sensor_msgs::NavSatFix>("/fix", 1000);
 
-  rtklib_ros_bridge::rtklib_msgs rtklib_nav;
+  rtklib_msgs::RtklibNav rtklib_nav;
   sensor_msgs::NavSatFix fix;
 
   struct sockaddr_in server;
@@ -79,6 +79,10 @@ int main(int argc, char** argv)
 
     if (recv_packet_size > 0)
     {
+
+      rtklib_nav.header.stamp = rtklib_nav.status.header.stamp = fix.header.stamp = ros::Time::now();
+      rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
+
       std::vector<int> LF_index;
 
       for (i = 0; i < recv_packet_size; i++)
@@ -149,8 +153,6 @@ int main(int argc, char** argv)
       rtklib_nav.status.altitude = fix.altitude = atof(data_buf);
       // ROS_INFO("altitude=%10.10lf",altitude);
 
-      rtklib_nav.header.stamp = rtklib_nav.status.header.stamp = fix.header.stamp = ros::Time::now();
-      rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
       pub1.publish(rtklib_nav);
       pub2.publish(fix);
 

@@ -9,7 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-   CATKIN_DEPENDS roscpp std_msgs rtklib_msgs sensor_msgs
+   CATKIN_DEPENDS
+   roscpp
+   std_msgs
+   rtklib_msgs
+   sensor_msgs
 )
 
 include_directories(
@@ -17,5 +21,5 @@ include_directories(
 )
 
 add_executable(rtklib_bridge src/rtklib_bridge.cpp)
-add_dependencies(rtklib_bridge ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(rtklib_bridge rtklib_msgs_generate_messages_cpp)
 target_link_libraries(rtklib_bridge ${catkin_LIBRARIES})

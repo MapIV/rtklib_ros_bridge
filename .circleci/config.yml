@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: ros:kinetic
 
-    working_directory: ~/rtklib_ros_bridge/rtklib_bridge
+    working_directory: ~/rtklib_ros_bridge
 
     steps:
       - checkout
@@ -14,7 +14,7 @@ jobs:
           command: |
             apt-get update -qq && apt-get install -y python-catkin-tools
             source /opt/ros/kinetic/setup.bash
-            rosdep install --from-paths src --ignore-src -y --rosdistro kinetic
+            rosdep install --from-paths . --ignore-src -y --rosdistro kinetic
 
       - run:
           name: Build

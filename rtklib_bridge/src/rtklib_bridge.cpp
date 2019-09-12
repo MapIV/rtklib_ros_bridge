@@ -77,6 +77,8 @@ int main(int argc, char** argv)
     memset(recv_buf, 0, sizeof(recv_buf));
     recv_packet_size = recv(sock, recv_buf, sizeof(recv_buf), 0);
 
+    //ROS_INFO("RAWdata:%s",recv_buf);
+
     if (recv_packet_size > 0)
     {
 
@@ -90,7 +92,7 @@ int main(int argc, char** argv)
         if (recv_buf[i] == 0x0a)
         {  // 0x0a = LF
           LF_index.push_back(i);
-          // ROS_INFO("%d",i);
+           //ROS_INFO("%d",i);
         }
       }
 
@@ -100,61 +102,100 @@ int main(int argc, char** argv)
       // ROS_INFO("tow=%d",tow);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[1]], LF_index[1] - LF_index[0]);
+      memcpy(data_buf, &recv_buf[LF_index[1]], LF_index[1]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.x = atof(data_buf);
       // ROS_INFO("ecef_pos_x=%10.10lf",ecef_pos_x);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[2]], LF_index[2] - LF_index[1]);
+      memcpy(data_buf, &recv_buf[LF_index[2]], LF_index[2]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.y = atof(data_buf);
       // ROS_INFO("ecef_pos_y=%10.10lf",ecef_pos_y);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[3]], LF_index[3] - LF_index[2]);
+      memcpy(data_buf, &recv_buf[LF_index[3]], LF_index[3]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.z = atof(data_buf);
       // ROS_INFO("ecef_pos_z=%10.10lf",ecef_pos_z);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[4]], LF_index[4] - LF_index[3]);
+      memcpy(data_buf, &recv_buf[LF_index[4]], LF_index[4]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.x = atof(data_buf);
       // ROS_INFO("ecef_vel_x=%10.10lf",ecef_vel_x);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[5]], LF_index[5] - LF_index[4]);
+      memcpy(data_buf, &recv_buf[LF_index[5]], LF_index[5]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.y = atof(data_buf);
       // ROS_INFO("ecef_vel_y=%10.10lf",ecef_vel_y);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[6]], LF_index[6] - LF_index[5]);
+      memcpy(data_buf, &recv_buf[LF_index[6]], LF_index[6]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.z = atof(data_buf);
       // ROS_INFO("ecef_vel_z=%10.10lf",ecef_vel_z);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7] - LF_index[6]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7]);
+      //ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.status.latitude = fix.latitude = atof(data_buf);
-      // ROS_INFO("latitude=%10.10lf",latitude);
+      //ROS_INFO("latitude=%10.10lf",rtklib_nav.status.latitude);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[8]], LF_index[8] - LF_index[7]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      memcpy(data_buf, &recv_buf[LF_index[8]], LF_index[8]);
+      //ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.status.longitude = fix.longitude = atof(data_buf);
-      // ROS_INFO("longitude=%10.10lf",longitude);
+      //ROS_INFO("longitude=%10.10lf",rtklib_nav.status.longitude);
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[9]], LF_index[9] - LF_index[8]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      memcpy(data_buf, &recv_buf[LF_index[9]], LF_index[9]);
+      //ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.status.altitude = fix.altitude = atof(data_buf);
-      // ROS_INFO("altitude=%10.10lf",altitude);
+      //ROS_INFO("altitude=%10.10lf",rtklib_nav.status.altitude);
+
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[10]], LF_index[10]);
+      //ROS_INFO("data_buf=%s",data_buf);
+      if(atoi(data_buf) == 1)
+      {
+        rtklib_nav.status.status.status = fix.status.status = 0;
+      }
+      else
+      {
+        rtklib_nav.status.status.status = fix.status.status = -1;
+      }
+
+      rtklib_nav.status.status.service = fix.status.service = 1; //Currently fixed value
+
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[11]], LF_index[11]);
+      rtklib_nav.status.position_covariance[0] = fix.position_covariance[0] = atof(data_buf);
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[12]], LF_index[12]);
+      rtklib_nav.status.position_covariance[4] = fix.position_covariance[4] = atof(data_buf);
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[13]], LF_index[13]);
+      rtklib_nav.status.position_covariance[8] = fix.position_covariance[8] = atof(data_buf);
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[14]], LF_index[14]);
+      rtklib_nav.status.position_covariance[1] = fix.position_covariance[1] = atof(data_buf);
+      rtklib_nav.status.position_covariance[3] = fix.position_covariance[3] = atof(data_buf);
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[15]], LF_index[15]);
+      rtklib_nav.status.position_covariance[5] = fix.position_covariance[5] = atof(data_buf);
+      rtklib_nav.status.position_covariance[7] = fix.position_covariance[7] = atof(data_buf);
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[16]], LF_index[16]);
+      rtklib_nav.status.position_covariance[2] = fix.position_covariance[2] = atof(data_buf);
+      rtklib_nav.status.position_covariance[6] = fix.position_covariance[6] = atof(data_buf);
+      rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
       pub1.publish(rtklib_nav);
       pub2.publish(fix);
+
+      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n",double(rtklib_nav.tow/1000.0),rtklib_nav.status.latitude,rtklib_nav.status.longitude,rtklib_nav.status.altitude);
 
     }
     else if (recv_packet_size == 0)

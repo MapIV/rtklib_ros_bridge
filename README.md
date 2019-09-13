@@ -68,4 +68,4 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 
 5) Start rtklib_ros_bridge.
 
-		rosrun rtklib_ros_bridge rtklib_ros_bridge   
+		rosrun rtklib_bridge rtklib_bridge   

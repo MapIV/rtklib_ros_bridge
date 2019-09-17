@@ -58,7 +58,7 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 1) Connect the GNSS receiver and start RTKLIB.
 
 		cd $HOME/RTKLIB  
-		./rtklib_ros_bridge_sample.sh  
+		bash rtklib_ros_bridge_sample.sh  
 
 4) Check the status of RTKLIB. If GPS Time is moving, it is OK. Execute the following command in the terminal of item 3.
 

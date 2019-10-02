@@ -60,12 +60,12 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 		cd $HOME/RTKLIB  
 		bash rtklib_ros_bridge_sample.sh  
 
-4) Check the status of RTKLIB. If GPS Time is moving, it is OK. Execute the following command in the terminal of item 3.
+2) Check the status of RTKLIB. If GPS Time is moving, it is OK. Execute the following command in the terminal of item 3.
 
 		status 0.1  
 
 ※If GPS Time is not working, there may be a mistake in the receiver settings or RTKLIB settings.
 
-5) Start rtklib_ros_bridge.
+3) Start rtklib_ros_bridge.
 
 		rosrun rtklib_bridge rtklib_bridge   

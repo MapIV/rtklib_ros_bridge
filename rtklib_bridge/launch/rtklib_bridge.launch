@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+  <rosparam command="load" file="$(find rtklib_bridge)/config/config.yaml"/>
+  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" />
+
+</launch>

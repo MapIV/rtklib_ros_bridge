@@ -1,0 +1,2 @@
+rtklib_bridge:
+  altitude_estimate: true

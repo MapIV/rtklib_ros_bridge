@@ -34,6 +34,7 @@
 #include "ros/ros.h"
 #include "rtklib_msgs/RtklibNav.h"
 #include "sensor_msgs/NavSatFix.h"
+#include "hgeoid.hpp"
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -51,6 +52,10 @@ int main(int argc, char** argv)
 
   rtklib_msgs::RtklibNav rtklib_nav;
   sensor_msgs::NavSatFix fix;
+
+  bool altitude_estimate = true;
+  n.getParam("altitude_estimate",altitude_estimate);
+  std::cout<< "altitude_estimate "<<altitude_estimate<<std::endl;
 
   struct sockaddr_in server;
 
@@ -165,6 +170,18 @@ int main(int argc, char** argv)
       else
       {
         rtklib_nav.status.status.status = fix.status.status = -1;
+      }
+
+      double llh[3],height;
+
+      if(altitude_estimate == true)
+      {
+        llh[0] = fix.latitude;
+        llh[1] = fix.longitude;
+        llh[2] = fix.altitude;
+        hgeoid(llh,&height);
+        rtklib_nav.status.altitude = fix.altitude = llh[2] - height;
+
       }
 
       rtklib_nav.status.status.service = fix.status.service = 1; //Currently fixed value

@@ -2,7 +2,7 @@
 
 <launch>
 
-  <rosparam command="load" file="$(find rtklib_bridge)/config/config.yaml"/>
+  <param name="altitude_estimate" value="true"/>
   <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" />
 
 </launch>

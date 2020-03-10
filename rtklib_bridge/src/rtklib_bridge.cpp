@@ -54,7 +54,7 @@ int main(int argc, char** argv)
   sensor_msgs::NavSatFix fix;
 
   bool altitude_estimate = true;
-  n.getParam("/rtklib_bridge/altitude_estimate",altitude_estimate);
+  n.getParam("altitude_estimate",altitude_estimate);
   std::cout<< "altitude_estimate "<<altitude_estimate<<std::endl;
 
   struct sockaddr_in server;

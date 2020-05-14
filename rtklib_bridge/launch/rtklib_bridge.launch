@@ -2,6 +2,8 @@
 
 <launch>
 
+  <param name="ip_adress" value="127.0.0.1"/>
+  <param name="port" value="61111"/>
   <param name="altitude_estimate" value="true"/>
   <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" />
 

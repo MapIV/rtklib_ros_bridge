@@ -53,8 +53,15 @@ int main(int argc, char** argv)
   rtklib_msgs::RtklibNav rtklib_nav;
   sensor_msgs::NavSatFix fix;
 
+  std::string ip_adress = "127.0.0.1";
+  int port = 61111;
   bool altitude_estimate = true;
+  n.getParam("ip_adress",ip_adress);
+  n.getParam("port",port);
   n.getParam("altitude_estimate",altitude_estimate);
+
+  std::cout<< "ip_adress "<<ip_adress<<std::endl;
+  std::cout<< "port "<<port<<std::endl;
   std::cout<< "altitude_estimate "<<altitude_estimate<<std::endl;
 
   struct sockaddr_in server;
@@ -66,8 +73,8 @@ int main(int argc, char** argv)
   sock = socket(AF_INET, SOCK_STREAM, 0);
 
   server.sin_family = AF_INET;
-  server.sin_port = htons(61111);
-  server.sin_addr.s_addr = inet_addr("127.0.0.1");
+  server.sin_port = htons(port);
+  server.sin_addr.s_addr = inet_addr(ip_adress.c_str());
 
   connect(sock, (struct sockaddr*)&server, sizeof(server));
 

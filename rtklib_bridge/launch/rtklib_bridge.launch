@@ -6,6 +6,6 @@
   <param name="port" value="61111"/>
   <param name="altitude_estimate" value="false"/>
   <!-- When outputting on ellipsoidal height (WGS 84) = false ,When outputting in altitude = true -->
-  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" />
+  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" respawn="true"/>
 
 </launch>

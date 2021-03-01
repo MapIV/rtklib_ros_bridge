@@ -30,10 +30,10 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 
 4) Next, download and build rtklib_ros_bridge.
 
-		cd $HOME/catkin_ws/src  
+		cd $HOME/colcon_ws/src  
 		git clone https://github.com/MapIV/rtklib_ros_bridge.git  
 		cd ..  
-		catkin_make -DCMAKE_BUILD_TYPE=Release  
+		colcon build  
 
 ## Configuration
 1) Open RTKLIB settings.
@@ -68,4 +68,5 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 
 3) Start rtklib_ros_bridge.
 
-		rosrun rtklib_bridge rtklib_bridge   
+		ros2 run rtklib_bridge rtklib_bridge --ros-args --params-file '$HOME/colcon_ws/src/rtklib_bridge/param/param.yaml'   
+		

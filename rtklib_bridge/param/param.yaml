@@ -1,0 +1,5 @@
+rtklib_bridge:
+    ros__parameters:
+        ip_adress: "127.0.0.1"
+        port: 61111
+        altitude_estimate: true

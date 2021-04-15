@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  kinetic:
+  foxy:
     docker:
-      - image: ros:kinetic
+      - image: ros:foxy
 
     working_directory: ~/rtklib_ros_bridge
 
@@ -10,25 +10,26 @@ jobs:
       - checkout
 
       - run:
-          name: Install catkin
+          name: Setup dependency
           command: |
-            apt-get update -qq && apt-get install -y python-catkin-tools
-            source /opt/ros/kinetic/setup.bash
-            rosdep install --from-paths . --ignore-src -y --rosdistro kinetic
-
+            apt-get update -qq
+            apt-get install -y software-properties-common
+            apt-get install -y -qq --no-install-recommends python3-vcstool
+            source /opt/ros/foxy/setup.bash
+            mkdir ~/tmp
+            ln -s ~/project ~/tmp/src
+            cd ~/tmp
+            rosdep install --from-paths . --ignore-src -y
       - run:
           name: Build
           command: |
-            source /opt/ros/kinetic/setup.bash
-            mkdir -p /tmp/ws/src
-            ln -s `pwd` /tmp/ws/src/package
-            cd /tmp/ws/src
-            catkin_init_workspace
-            cd ../
-            catkin_make -DCMAKE_BUILD_TYPE=Release -j1
-
+            source /opt/ros/foxy/setup.bash
+            mkdir -p ~/tmp/ws/src
+            ln -s `pwd` ~/tmp/ws/src/package
+            cd ~/tmp/ws/
+            colcon build
 workflows:
   version: 2
   ros_build:
     jobs:
-      - kinetic
+      - foxy

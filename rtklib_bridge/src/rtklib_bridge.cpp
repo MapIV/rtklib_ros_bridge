@@ -27,13 +27,12 @@
  * rtklib_bridge.cpp
  * Program for connecting with RTKLIB
  * Author MapIV Sekino
- * Ver 1.00 2019/3/6
- * Ver 2.00 2019/9/11 Changed to output ecef xyz and latitude and longitude
+ * Ver 0.00 
  */
 
-#include "ros/ros.h"
-#include "rtklib_msgs/RtklibNav.h"
-#include "sensor_msgs/NavSatFix.h"
+#include "rclcpp/rclcpp.hpp"
+#include "rtklib_msgs/msg/rtklib_nav.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "hgeoid.hpp"
 #include <stdio.h>
 #include <sys/types.h>
@@ -42,27 +41,43 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <math.h>
+#include <string>
+#include <vector>
+
+#include "rclcpp/time.hpp"
+#include <chrono>
+#include "rclcpp/clock.hpp"
+
+#include "rclcpp/parameter.hpp"
+#include "rclcpp/node.hpp"
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "rtklib_bridge");
-  ros::NodeHandle n;
-  ros::Publisher pub1 = n.advertise<rtklib_msgs::RtklibNav>("/rtklib_nav", 1);
-  ros::Publisher pub2 = n.advertise<sensor_msgs::NavSatFix>("/fix", 1000);
+  rclcpp::init(argc, argv);
+  auto node = rclcpp::Node::make_shared("rtklib_bridge");
+  auto pub1 = node->create_publisher<rtklib_msgs::msg::RtklibNav>("/rtklib_nav", 1);
+  auto pub2 = node->create_publisher<sensor_msgs::msg::NavSatFix>("/fix", 1000);
 
-  rtklib_msgs::RtklibNav rtklib_nav;
-  sensor_msgs::NavSatFix fix;
+  rtklib_msgs::msg::RtklibNav rtklib_nav;
+  sensor_msgs::msg::NavSatFix fix;
+
+  rclcpp::Clock ros_clock(RCL_ROS_TIME);
 
   std::string ip_adress = "127.0.0.1";
   int port = 61111;
   bool altitude_estimate = true;
-  n.getParam("ip_adress",ip_adress);
-  n.getParam("port",port);
-  n.getParam("altitude_estimate",altitude_estimate);
 
-  std::cout<< "ip_adress "<<ip_adress<<std::endl;
-  std::cout<< "port "<<port<<std::endl;
-  std::cout<< "altitude_estimate "<<altitude_estimate<<std::endl;
+  node->declare_parameter("ip_adress" , "127.0.0.1");
+  node->declare_parameter("port" , 61111);
+  node->declare_parameter("altitude_estimate" , true);
+
+  ip_adress = node->get_parameter("ip_adress").as_string();
+  port = node->get_parameter("port").as_int();
+  altitude_estimate = node->get_parameter("altitude_estimate").as_bool();
+
+  std::cout << "ip_adress " << ip_adress << std::endl;
+  std::cout << "port " << port << std::endl;
+  std::cout << "altitude_estimate " << altitude_estimate << std::endl;
 
   struct sockaddr_in server;
 
@@ -82,19 +97,19 @@ int main(int argc, char** argv)
   int i;
   memset(data_buf, 0, sizeof(data_buf));
 
-  while (ros::ok())
+  while (rclcpp::ok())
   {
-    ros::spinOnce();
+    rclcpp::spin_some(node);
 
     memset(recv_buf, 0, sizeof(recv_buf));
     recv_packet_size = recv(sock, recv_buf, sizeof(recv_buf), 0);
 
-    //ROS_INFO("RAWdata:%s",recv_buf);
+    // ROS_INFO("RAWdata:%s",recv_buf);
 
     if (recv_packet_size > 0)
     {
 
-      rtklib_nav.header.stamp = rtklib_nav.status.header.stamp = fix.header.stamp = ros::Time::now();
+      rtklib_nav.header.stamp = rtklib_nav.status.header.stamp = fix.header.stamp = ros_clock.now();
       rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
 
       std::vector<int> LF_index;
@@ -104,7 +119,7 @@ int main(int argc, char** argv)
         if (recv_buf[i] == 0x0a)
         {  // 0x0a = LF
           LF_index.push_back(i);
-           //ROS_INFO("%d",i);
+           // ROS_INFO("%d",i);
         }
       }
 
@@ -151,25 +166,25 @@ int main(int argc, char** argv)
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.status.latitude = fix.latitude = atof(data_buf);
-      //ROS_INFO("latitude=%10.10lf",rtklib_nav.status.latitude);
+      // ROS_INFO("latitude=%10.10lf",rtklib_nav.status.latitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[8]], LF_index[8]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.status.longitude = fix.longitude = atof(data_buf);
-      //ROS_INFO("longitude=%10.10lf",rtklib_nav.status.longitude);
+      // ROS_INFO("longitude=%10.10lf",rtklib_nav.status.longitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[9]], LF_index[9]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.status.altitude = fix.altitude = atof(data_buf);
-      //ROS_INFO("altitude=%10.10lf",rtklib_nav.status.altitude);
+      // ROS_INFO("altitude=%10.10lf",rtklib_nav.status.altitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[10]], LF_index[10]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf=%s",data_buf);
       if(atoi(data_buf) == 1)
       {
         rtklib_nav.status.status.status = fix.status.status = 0;
@@ -179,19 +194,19 @@ int main(int argc, char** argv)
         rtklib_nav.status.status.status = fix.status.status = -1;
       }
 
-      double llh[3],height;
+      double llh[3] , height;
 
       if(altitude_estimate == true)
       {
         llh[0] = fix.latitude;
         llh[1] = fix.longitude;
         llh[2] = fix.altitude;
-        hgeoid(llh,&height);
+        hgeoid(llh ,  &height);
         rtklib_nav.status.altitude = fix.altitude = llh[2] - height;
 
       }
 
-      rtklib_nav.status.status.service = fix.status.service = 1; //Currently fixed value
+      rtklib_nav.status.status.service = fix.status.service = 1;  // Currently fixed value
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[11]], LF_index[11]);
@@ -216,26 +231,28 @@ int main(int argc, char** argv)
       rtklib_nav.status.position_covariance[6] = fix.position_covariance[6] = atof(data_buf);
       rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
-      pub1.publish(rtklib_nav);
-      pub2.publish(fix);
+      pub1->publish(rtklib_nav);
+      pub2->publish(fix);
 
-      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n",double(rtklib_nav.tow/1000.0),rtklib_nav.status.latitude,rtklib_nav.status.longitude,rtklib_nav.status.altitude);
+      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n" , double(rtklib_nav.tow/1000.0) , rtklib_nav.status.latitude , rtklib_nav.status.longitude , rtklib_nav.status.altitude);
 
     }
     else if (recv_packet_size == 0)
     {
-      ROS_WARN("RTKLIB has been disconnected");
+//      ROS_WARN("RTKLIB has been disconnected");
+      printf("RTKLIB has been disconnected");
       break;
     }
     else
     {
-      ROS_WARN("RTKLIB is not started");
+//      ROS_WARN("RTKLIB is not started");
+      printf("RTKLIB is not started");
       break;
     }
   }
 
   close(sock);
-  n.shutdown();
+  rclcpp::shutdown();
 
   return 0;
 }

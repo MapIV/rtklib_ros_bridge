@@ -31,7 +31,7 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 4) Next, download and build rtklib_ros_bridge.
 
 		cd $HOME/colcon_ws/src  
-		git clone https://github.com/MapIV/rtklib_ros_bridge.git  
+		git clone -b ros2-v0.1.0 https://github.com/MapIV/rtklib_ros_bridge.git  
 		cd ..  
 		colcon build  
 
@@ -58,7 +58,7 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 1) Connect the GNSS receiver and start RTKLIB.
 
 		cd $HOME/RTKLIB  
-		bash rtklib_ros_bridge_sample.sh  
+		bash rtklib_ros_bridge_single.sh  
 
 2) Check the status of RTKLIB. If GPS Time is moving, it is OK. Execute the following command in the terminal of item 3.
 
@@ -68,5 +68,5 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 
 3) Start rtklib_ros_bridge.
 
-		ros2 run rtklib_bridge rtklib_bridge --ros-args --params-file '$HOME/colcon_ws/src/rtklib_bridge/param/param.yaml'   
+		ros2 run rtklib_bridge rtklib_bridge --ros-args --params-file $HOME/colcon_ws/src/rtklib_ros_bridge/rtklib_bridge/param/param.yaml   
 		

@@ -95,7 +95,7 @@ int main(int argc, char** argv)
     {
 
       rtklib_nav.header.stamp = rtklib_nav.status.header.stamp = fix.header.stamp = ros::Time::now();
-      rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
+      rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gnss";
 
       std::vector<int> LF_index;
 

@@ -24,3 +24,14 @@ include_directories(
 add_executable(rtklib_bridge src/rtklib_bridge.cpp)
 add_dependencies(rtklib_bridge rtklib_msgs_generate_messages_cpp)
 target_link_libraries(rtklib_bridge ${catkin_LIBRARIES})
+
+install(TARGETS
+  rtklib_bridge
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY
+    launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

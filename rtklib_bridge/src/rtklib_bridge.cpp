@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "rtklib_bridge");
   ros::NodeHandle n;
   ros::Publisher pub1 = n.advertise<rtklib_msgs::RtklibNav>("rtklib_nav", 1);
-  ros::Publisher pub2 = n.advertise<sensor_msgs::NavSatFix>("fix", 1000);
+  ros::Publisher pub2 = n.advertise<sensor_msgs::NavSatFix>("rtklib/fix", 1000);
 
   rtklib_msgs::RtklibNav rtklib_nav;
   sensor_msgs::NavSatFix fix;

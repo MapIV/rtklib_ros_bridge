@@ -231,6 +231,8 @@ int main(int argc, char** argv)
       rtklib_nav.status.position_covariance[6] = fix.position_covariance[6] = atof(data_buf);
       rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
+      if (sqrt(pow(rtklib_nav.ecef_pos.x, 2.0) + pow(rtklib_nav.ecef_pos.y, 2.0) + pow(rtklib_nav.ecef_pos.z, 2.0)) < 10000) continue; // Ground surface guard
+
       pub1->publish(rtklib_nav);
       pub2->publish(fix);
 

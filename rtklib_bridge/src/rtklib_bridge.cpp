@@ -55,8 +55,8 @@ int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("rtklib_bridge");
-  auto pub1 = node->create_publisher<rtklib_msgs::msg::RtklibNav>("/rtklib_nav", 1);
-  auto pub2 = node->create_publisher<sensor_msgs::msg::NavSatFix>("/fix", 1000);
+  auto pub1 = node->create_publisher<rtklib_msgs::msg::RtklibNav>("rtklib_nav", 1);
+  auto pub2 = node->create_publisher<sensor_msgs::msg::NavSatFix>("rtklib/fix", 1000);
 
   rtklib_msgs::msg::RtklibNav rtklib_nav;
   sensor_msgs::msg::NavSatFix fix;

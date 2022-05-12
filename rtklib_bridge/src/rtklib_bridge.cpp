@@ -216,6 +216,18 @@ int main(int argc, char** argv)
       rtklib_nav.status.position_covariance[6] = fix.position_covariance[6] = atof(data_buf);
       rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[17]], LF_index[17]);
+      if(data_buf != "RTKLIB")
+      {
+        ROS_INFO("Received packet is corrupted!");
+        break;
+      }
+      else
+      {
+        ROS_INFO("Received packet is OK!");
+      }
+
       pub1.publish(rtklib_nav);
       pub2.publish(fix);
 

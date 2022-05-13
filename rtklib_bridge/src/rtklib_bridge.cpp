@@ -218,14 +218,16 @@ int main(int argc, char** argv)
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[17]], LF_index[17]);
-      if(data_buf != "RTKLIB")
+      std::string check_packets_str(data_buf);
+      // std::cout << "check_packets_str" << (check_packets_str.find("RTKLIB") != std::string::npos) << std::endl;
+      if(check_packets_str.find("RTKLIB") == std::string::npos)
       {
-        ROS_INFO("Received packet is corrupted!");
-        break;
+        // ROS_INFO("Received packet is corrupted!");
+        continue;
       }
       else
       {
-        ROS_INFO("Received packet is OK!");
+        // ROS_INFO("Received packet is OK!");
       }
 
       pub1.publish(rtklib_nav);

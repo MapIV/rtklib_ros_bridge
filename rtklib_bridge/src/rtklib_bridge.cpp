@@ -222,7 +222,7 @@ int main(int argc, char** argv)
       // std::cout << "check_packets_str" << (check_packets_str.find("RTKLIB") != std::string::npos) << std::endl;
       if(check_packets_str.find("RTKLIB") == std::string::npos)
       {
-        // ROS_INFO("Received packet is corrupted!");
+        ROS_INFO("Received packet is corrupted!");
         continue;
       }
       else

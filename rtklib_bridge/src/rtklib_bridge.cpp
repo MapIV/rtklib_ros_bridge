@@ -98,6 +98,7 @@ int main(int argc, char** argv)
       rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gnss";
 
       std::vector<int> LF_index;
+      int index_size = 18;
 
       for (i = 0; i < recv_packet_size; i++)
       {
@@ -106,6 +107,11 @@ int main(int argc, char** argv)
           LF_index.push_back(i);
            //ROS_INFO("%d",i);
         }
+      }
+
+      if (LF_index.size() < index_size){
+        ROS_WARN("Received data is missing.");
+        continue;
       }
 
       memset(data_buf, 0, sizeof(data_buf));
@@ -217,18 +223,20 @@ int main(int argc, char** argv)
       rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
       memset(data_buf, 0, sizeof(data_buf));
-      memcpy(data_buf, &recv_buf[LF_index[17]], LF_index[17]);
+      memcpy(data_buf, &recv_buf[LF_index[17]], sizeof("RTKLIB"));
       std::string check_packets_str(data_buf);
       // std::cout << "check_packets_str" << (check_packets_str.find("RTKLIB") != std::string::npos) << std::endl;
       if(check_packets_str.find("RTKLIB") == std::string::npos)
       {
-        ROS_INFO("Received packet is corrupted!");
+        ROS_WARN("Received packet is corrupted!");
         continue;
       }
       else
       {
         // ROS_INFO("Received packet is OK!");
       }
+
+      // ROS_INFO("RAWdata:%s",recv_buf);
 
       pub1.publish(rtklib_nav);
       pub2.publish(fix);

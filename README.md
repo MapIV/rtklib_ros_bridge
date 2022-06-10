@@ -11,7 +11,7 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 		cd $HOME  
 		git clone https://github.com/MapIV/RTKLIB.git
 		cd $HOME/RTKLIB     
-		git checkout rtklib_ros_bridge    
+		git checkout rtklib_ros_bridge_b34    
 
 	[About RTKLIB](http://www.rtklib.com)
 

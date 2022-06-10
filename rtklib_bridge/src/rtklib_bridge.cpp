@@ -56,13 +56,13 @@ int main(int argc, char** argv)
   std::string ip_adress = "127.0.0.1";
   int port = 61111;
   bool altitude_estimate = true;
-  n.getParam("ip_adress",ip_adress);
-  n.getParam("port",port);
-  n.getParam("altitude_estimate",altitude_estimate);
+  n.getParam("ip_adress", ip_adress);
+  n.getParam("port", port);
+  n.getParam("altitude_estimate", altitude_estimate);
 
-  std::cout<< "ip_adress "<<ip_adress<<std::endl;
-  std::cout<< "port "<<port<<std::endl;
-  std::cout<< "altitude_estimate "<<altitude_estimate<<std::endl;
+  std::cout << "ip_adress " << ip_adress << std::endl;
+  std::cout << "port "<< port <<std::endl;
+  std::cout << "altitude_estimate " << altitude_estimate << std::endl;
 
   struct sockaddr_in server;
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     memset(recv_buf, 0, sizeof(recv_buf));
     recv_packet_size = recv(sock, recv_buf, sizeof(recv_buf), 0);
 
-    //ROS_INFO("RAWdata:%s",recv_buf);
+    // ROS_INFO("RAWdata:%s", recv_buf);
 
     if (recv_packet_size > 0)
     {
@@ -99,13 +99,14 @@ int main(int argc, char** argv)
 
       std::vector<int> LF_index;
       int index_size = 18;
+      // recv_buf has 18 lines when correctly received from RTKLIB.
 
       for (i = 0; i < recv_packet_size; i++)
       {
         if (recv_buf[i] == 0x0a)
         {  // 0x0a = LF
           LF_index.push_back(i);
-           //ROS_INFO("%d",i);
+          //  ROS_INFO("%d",i);
         }
       }
 
@@ -117,65 +118,65 @@ int main(int argc, char** argv)
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[5], 11);
       rtklib_nav.tow = atof(data_buf) * 1000;  // unit[ms]
-      // ROS_INFO("tow=%d",tow);
+      // ROS_INFO("tow = %d", rtklib_nav.tow);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[1]], LF_index[1]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.ecef_pos.x = atof(data_buf);
-      // ROS_INFO("ecef_pos_x=%10.10lf",ecef_pos_x);
+      // ROS_INFO("ecef_pos_x = %10.10lf", rtklib_nav.ecef_pos.x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[2]], LF_index[2]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.ecef_pos.y = atof(data_buf);
-      // ROS_INFO("ecef_pos_y=%10.10lf",ecef_pos_y);
+      // ROS_INFO("ecef_pos_y = %10.10lf", rtklib_nav.ecef_pos.y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[3]], LF_index[3]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.ecef_pos.z = atof(data_buf);
-      // ROS_INFO("ecef_pos_z=%10.10lf",ecef_pos_z);
+      // ROS_INFO("ecef_pos_z = %10.10lf", rtklib_nav.ecef_pos.z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[4]], LF_index[4]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.ecef_vel.x = atof(data_buf);
-      // ROS_INFO("ecef_vel_x=%10.10lf",ecef_vel_x);
+      // ROS_INFO("ecef_vel_x = %10.10lf", rtklib_nav.ecef_vel.x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[5]], LF_index[5]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.ecef_vel.y = atof(data_buf);
-      // ROS_INFO("ecef_vel_y=%10.10lf",ecef_vel_y);
+      // ROS_INFO("ecef_vel_y = %10.10lf", rtklib_nav.ecef_vel.y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[6]], LF_index[6]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.ecef_vel.z = atof(data_buf);
-      // ROS_INFO("ecef_vel_z=%10.10lf",ecef_vel_z);
+      // ROS_INFO("ecef_vel_z = %10.10lf", rtklib_nav.ecef_vel.z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.status.latitude = fix.latitude = atof(data_buf);
-      //ROS_INFO("latitude=%10.10lf",rtklib_nav.status.latitude);
+      // ROS_INFO("latitude = %10.10lf", rtklib_nav.status.latitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[8]], LF_index[8]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.status.longitude = fix.longitude = atof(data_buf);
-      //ROS_INFO("longitude=%10.10lf",rtklib_nav.status.longitude);
+      // ROS_INFO("longitude = %10.10lf", rtklib_nav.status.longitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[9]], LF_index[9]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.status.altitude = fix.altitude = atof(data_buf);
-      //ROS_INFO("altitude=%10.10lf",rtklib_nav.status.altitude);
+      // ROS_INFO("altitude = %10.10lf",rtklib_nav.status.altitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[10]], LF_index[10]);
-      //ROS_INFO("data_buf=%s",data_buf);
+      // ROS_INFO("data_buf = %s",data_buf);
       if(atoi(data_buf) == 1)
       {
         rtklib_nav.status.status.status = fix.status.status = 0;
@@ -197,7 +198,7 @@ int main(int argc, char** argv)
 
       }
 
-      rtklib_nav.status.status.service = fix.status.service = 1; //Currently fixed value
+      rtklib_nav.status.status.service = fix.status.service = 1; // Currently fixed value
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[11]], LF_index[11]);
@@ -225,15 +226,10 @@ int main(int argc, char** argv)
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[17]], sizeof("RTKLIB"));
       std::string check_packets_str(data_buf);
-      // std::cout << "check_packets_str" << (check_packets_str.find("RTKLIB") != std::string::npos) << std::endl;
       if(check_packets_str.find("RTKLIB") == std::string::npos)
       {
         ROS_WARN("Received packet is corrupted!");
         continue;
-      }
-      else
-      {
-        // ROS_INFO("Received packet is OK!");
       }
 
       // ROS_INFO("RAWdata:%s",recv_buf);
@@ -241,7 +237,8 @@ int main(int argc, char** argv)
       pub1.publish(rtklib_nav);
       pub2.publish(fix);
 
-      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n",double(rtklib_nav.tow/1000.0),rtklib_nav.status.latitude,rtklib_nav.status.longitude,rtklib_nav.status.altitude);
+      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n",double(rtklib_nav.tow/1000.0),
+        rtklib_nav.status.latitude,rtklib_nav.status.longitude,rtklib_nav.status.altitude);
 
     }
     else if (recv_packet_size == 0)

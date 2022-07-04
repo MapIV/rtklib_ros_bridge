@@ -113,6 +113,8 @@ int main(int argc, char** argv)
       rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
 
       std::vector<int> LF_index;
+      int index_size = 18;
+      // recv_buf has 18 lines when correctly received from RTKLIB.
 
       for (i = 0; i < recv_packet_size; i++)
       {
@@ -123,46 +125,51 @@ int main(int argc, char** argv)
         }
       }
 
+      if (LF_index.size() < index_size){
+        printf("Received data is missing.");
+        continue;
+      }
+
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[5], 11);
       rtklib_nav.tow = atof(data_buf) * 1000;  // unit[ms]
-      // ROS_INFO("tow=%d",tow);
+      // ROS_INFO("tow=%d",rtklib_nav.tow);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[1]], LF_index[1]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.x = atof(data_buf);
-      // ROS_INFO("ecef_pos_x=%10.10lf",ecef_pos_x);
+      // ROS_INFO("ecef_pos_x=%10.10lf",rtklib_nav.ecef_pos_x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[2]], LF_index[2]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.y = atof(data_buf);
-      // ROS_INFO("ecef_pos_y=%10.10lf",ecef_pos_y);
+      // ROS_INFO("ecef_pos_y=%10.10lf",rtklib_nav.ecef_pos_y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[3]], LF_index[3]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.z = atof(data_buf);
-      // ROS_INFO("ecef_pos_z=%10.10lf",ecef_pos_z);
+      // ROS_INFO("ecef_pos_z=%10.10lf",rtklib_nav.ecef_pos_z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[4]], LF_index[4]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.x = atof(data_buf);
-      // ROS_INFO("ecef_vel_x=%10.10lf",ecef_vel_x);
+      // ROS_INFO("ecef_vel_x=%10.10lf",rtklib_nav.ecef_vel_x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[5]], LF_index[5]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.y = atof(data_buf);
-      // ROS_INFO("ecef_vel_y=%10.10lf",ecef_vel_y);
+      // ROS_INFO("ecef_vel_y=%10.10lf",rtklib_nav.ecef_vel_y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[6]], LF_index[6]);
       // ROS_INFO("data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.z = atof(data_buf);
-      // ROS_INFO("ecef_vel_z=%10.10lf",ecef_vel_z);
+      // ROS_INFO("ecef_vel_z=%10.10lf",rtklib_nav.ecef_vel_z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7]);
@@ -231,12 +238,22 @@ int main(int argc, char** argv)
       rtklib_nav.status.position_covariance[6] = fix.position_covariance[6] = atof(data_buf);
       rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
-      if (sqrt(pow(rtklib_nav.ecef_pos.x, 2.0) + pow(rtklib_nav.ecef_pos.y, 2.0) + pow(rtklib_nav.ecef_pos.z, 2.0)) < 10000) continue; // Ground surface guard
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[17]], sizeof("RTKLIB"));
+      std::string check_packets_str(data_buf);
+      if(check_packets_str.find("RTKLIB") == std::string::npos)
+      {
+        printf("Received packet is corrupted!");
+        continue;
+      }
+
+      // printf("RAWdata:%s",recv_buf);
 
       pub1->publish(rtklib_nav);
       pub2->publish(fix);
 
-      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n" , double(rtklib_nav.tow/1000.0) , rtklib_nav.status.latitude , rtklib_nav.status.longitude , rtklib_nav.status.altitude);
+      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n" ,
+          double(rtklib_nav.tow/1000.0) , rtklib_nav.status.latitude , rtklib_nav.status.longitude , rtklib_nav.status.altitude);
 
     }
     else if (recv_packet_size == 0)

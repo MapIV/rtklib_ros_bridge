@@ -60,6 +60,7 @@ int main(int argc, char** argv)
 
   rtklib_msgs::msg::RtklibNav rtklib_nav;
   sensor_msgs::msg::NavSatFix fix;
+  std::string node_name = "rtklib_bridge";
 
   rclcpp::Clock ros_clock(RCL_ROS_TIME);
 
@@ -104,7 +105,7 @@ int main(int argc, char** argv)
     memset(recv_buf, 0, sizeof(recv_buf));
     recv_packet_size = recv(sock, recv_buf, sizeof(recv_buf), 0);
 
-    // ROS_INFO("RAWdata:%s",recv_buf);
+    // RCLCPP_INFO(rclcpp::get_logger(node_name), "RAWdata:%s",recv_buf);
 
     if (recv_packet_size > 0)
     {
@@ -113,78 +114,85 @@ int main(int argc, char** argv)
       rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
 
       std::vector<int> LF_index;
+      int index_size = 18;
+      // recv_buf has 18 lines when correctly received from RTKLIB.
 
       for (i = 0; i < recv_packet_size; i++)
       {
         if (recv_buf[i] == 0x0a)
         {  // 0x0a = LF
           LF_index.push_back(i);
-           // ROS_INFO("%d",i);
+          //  RCLCPP_INFO(rclcpp::get_logger(node_name), "%d",i);
         }
+      }
+
+      if (LF_index.size() < index_size){
+        RCLCPP_WARN(rclcpp::get_logger(node_name), "Received data is missing.");
+        continue;
       }
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[5], 11);
       rtklib_nav.tow = atof(data_buf) * 1000;  // unit[ms]
-      // ROS_INFO("tow=%d",tow);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "tow=%d",rtklib_nav.tow);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[1]], LF_index[1]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.x = atof(data_buf);
-      // ROS_INFO("ecef_pos_x=%10.10lf",ecef_pos_x);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "ecef_pos_x=%10.10lf",rtklib_nav.ecef_pos.x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[2]], LF_index[2]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.y = atof(data_buf);
-      // ROS_INFO("ecef_pos_y=%10.10lf",ecef_pos_y);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "ecef_pos_y=%10.10lf",rtklib_nav.ecef_pos.y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[3]], LF_index[3]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.ecef_pos.z = atof(data_buf);
-      // ROS_INFO("ecef_pos_z=%10.10lf",ecef_pos_z);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "ecef_pos_z=%10.10lf",rtklib_nav.ecef_pos.z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[4]], LF_index[4]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.x = atof(data_buf);
-      // ROS_INFO("ecef_vel_x=%10.10lf",ecef_vel_x);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "ecef_vel_x=%10.10lf",rtklib_nav.ecef_vel.x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[5]], LF_index[5]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.y = atof(data_buf);
-      // ROS_INFO("ecef_vel_y=%10.10lf",ecef_vel_y);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "ecef_vel_y=%10.10lf",rtklib_nav.ecef_vel.y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[6]], LF_index[6]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.ecef_vel.z = atof(data_buf);
-      // ROS_INFO("ecef_vel_z=%10.10lf",ecef_vel_z);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "ecef_vel_z=%10.10lf",rtklib_nav.ecef_vel.z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.status.latitude = fix.latitude = atof(data_buf);
-      // ROS_INFO("latitude=%10.10lf",rtklib_nav.status.latitude);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "latitude=%10.10lf",rtklib_nav.status.latitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[8]], LF_index[8]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.status.longitude = fix.longitude = atof(data_buf);
-      // ROS_INFO("longitude=%10.10lf",rtklib_nav.status.longitude);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "longitude=%10.10lf",rtklib_nav.status.longitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[9]], LF_index[9]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       rtklib_nav.status.altitude = fix.altitude = atof(data_buf);
-      // ROS_INFO("altitude=%10.10lf",rtklib_nav.status.altitude);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "altitude=%10.10lf",rtklib_nav.status.altitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[10]], LF_index[10]);
-      // ROS_INFO("data_buf=%s",data_buf);
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "data_buf=%s",data_buf);
       if(atoi(data_buf) == 1)
       {
         rtklib_nav.status.status.status = fix.status.status = 0;
@@ -231,24 +239,32 @@ int main(int argc, char** argv)
       rtklib_nav.status.position_covariance[6] = fix.position_covariance[6] = atof(data_buf);
       rtklib_nav.status.position_covariance_type = fix.position_covariance_type = 3;
 
-      if (sqrt(pow(rtklib_nav.ecef_pos.x, 2.0) + pow(rtklib_nav.ecef_pos.y, 2.0) + pow(rtklib_nav.ecef_pos.z, 2.0)) < 10000) continue; // Ground surface guard
+      memset(data_buf, 0, sizeof(data_buf));
+      memcpy(data_buf, &recv_buf[LF_index[17]], sizeof("RTKLIB"));
+      std::string check_packets_str(data_buf);
+      if(check_packets_str.find("RTKLIB") == std::string::npos)
+      {
+        RCLCPP_WARN(rclcpp::get_logger(node_name), "Received packet is corrupted!");
+        continue;
+      }
+
+      // RCLCPP_INFO(rclcpp::get_logger(node_name), "RAWdata:%s",recv_buf);
 
       pub1->publish(rtklib_nav);
       pub2->publish(fix);
 
-      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n" , double(rtklib_nav.tow/1000.0) , rtklib_nav.status.latitude , rtklib_nav.status.longitude , rtklib_nav.status.altitude);
+      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n" ,
+          double(rtklib_nav.tow/1000.0) , rtklib_nav.status.latitude , rtklib_nav.status.longitude , rtklib_nav.status.altitude);
 
     }
     else if (recv_packet_size == 0)
     {
-//      ROS_WARN("RTKLIB has been disconnected");
-      printf("RTKLIB has been disconnected");
+      RCLCPP_WARN(rclcpp::get_logger(node_name), "RTKLIB has been disconnected");
       break;
     }
     else
     {
-//      ROS_WARN("RTKLIB is not started");
-      printf("RTKLIB is not started");
+      RCLCPP_WARN(rclcpp::get_logger(node_name), "RTKLIB is not started");
       break;
     }
   }

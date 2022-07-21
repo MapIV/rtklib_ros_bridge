@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+  <arg name="param_yaml" default="param.yaml"/>
+
+  <node pkg="rtklib_bridge" name="rtklib_bridge" exec="rtklib_bridge" output="screen">
+    <param from="$(find-pkg-share rtklib_bridge)/param/$(var param_yaml)"/>
+  </node>
+
+</launch>

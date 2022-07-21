@@ -68,5 +68,7 @@ rtklib_ros_bridge is a package that outputs the latitude and longitude, satellit
 
 3) Start rtklib_ros_bridge.
 
-		ros2 run rtklib_bridge rtklib_bridge --ros-args --params-file $HOME/colcon_ws/src/rtklib_ros_bridge/rtklib_bridge/param/param.yaml   
+		cd $HOME/colcon_ws/src 
+		source install/setup.bash
+		ros2 launch rtklib_bridge rtklib_bridge.launch.xml
 		

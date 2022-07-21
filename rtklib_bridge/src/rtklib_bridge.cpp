@@ -127,7 +127,7 @@ int main(int argc, char** argv)
       }
 
       if (LF_index.size() < index_size){
-        printf("Received data is missing.");
+        RCLCPP_WARN(rclcpp::get_logger(node_name), "Received data is missing.");
         continue;
       }
 

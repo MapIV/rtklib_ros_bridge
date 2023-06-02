@@ -114,7 +114,7 @@ int main(int argc, char** argv)
       rtklib_nav.header.frame_id = rtklib_nav.status.header.frame_id = fix.header.frame_id = "gps";
 
       std::vector<int> LF_index;
-      int index_size = 18;
+      std::vector<int>::size_type index_size = 18;
       // recv_buf has 18 lines when correctly received from RTKLIB.
 
       for (i = 0; i < recv_packet_size; i++)

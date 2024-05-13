@@ -82,14 +82,23 @@ int main(int argc, char** argv)
   int i;
   memset(data_buf, 0, sizeof(data_buf));
 
+  bool is_debug = true;
+
   while (ros::ok())
   {
     ros::spinOnce();
 
     memset(recv_buf, 0, sizeof(recv_buf));
     recv_packet_size = recv(sock, recv_buf, sizeof(recv_buf), 0);
+    if (recv_packet_size == -1) {
+        ROS_ERROR("Failed to receive data: %s", strerror(errno));
+        break;
+    } else if (recv_packet_size == 0) {
+        ROS_WARN("Connection closed by server");
+        break;
+    }
 
-    // ROS_INFO("RAWdata:%s", recv_buf);
+    // if(is_debug) ROS_INFO("RAWdata:%s", recv_buf);
 
     if (recv_packet_size > 0)
     {
@@ -118,65 +127,65 @@ int main(int argc, char** argv)
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[5], 11);
       rtklib_nav.tow = atof(data_buf) * 1000;  // unit[ms]
-      // ROS_INFO("tow = %d", rtklib_nav.tow);
+      if(is_debug) ROS_INFO("tow = %d", rtklib_nav.tow);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[1]], LF_index[1]);
-      // ROS_INFO("data_buf = %s",data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.ecef_pos.x = atof(data_buf);
-      // ROS_INFO("ecef_pos_x = %10.10lf", rtklib_nav.ecef_pos.x);
+      if(is_debug) ROS_INFO("ecef_pos_x = %10.10lf", rtklib_nav.ecef_pos.x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[2]], LF_index[2]);
-      // ROS_INFO("data_buf = %s",data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.ecef_pos.y = atof(data_buf);
-      // ROS_INFO("ecef_pos_y = %10.10lf", rtklib_nav.ecef_pos.y);
+      if(is_debug) ROS_INFO("ecef_pos_y = %10.10lf", rtklib_nav.ecef_pos.y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[3]], LF_index[3]);
-      // ROS_INFO("data_buf = %s",data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.ecef_pos.z = atof(data_buf);
-      // ROS_INFO("ecef_pos_z = %10.10lf", rtklib_nav.ecef_pos.z);
+      if(is_debug) ROS_INFO("ecef_pos_z = %10.10lf", rtklib_nav.ecef_pos.z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[4]], LF_index[4]);
-      // ROS_INFO("data_buf = %s", data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.ecef_vel.x = atof(data_buf);
-      // ROS_INFO("ecef_vel_x = %10.10lf", rtklib_nav.ecef_vel.x);
+      if(is_debug) ROS_INFO("ecef_vel_x = %10.10lf", rtklib_nav.ecef_vel.x);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[5]], LF_index[5]);
-      // ROS_INFO("data_buf = %s", data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.ecef_vel.y = atof(data_buf);
-      // ROS_INFO("ecef_vel_y = %10.10lf", rtklib_nav.ecef_vel.y);
+      if(is_debug) ROS_INFO("ecef_vel_y = %10.10lf", rtklib_nav.ecef_vel.y);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[6]], LF_index[6]);
-      // ROS_INFO("data_buf = %s", data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.ecef_vel.z = atof(data_buf);
-      // ROS_INFO("ecef_vel_z = %10.10lf", rtklib_nav.ecef_vel.z);
+      if(is_debug) ROS_INFO("ecef_vel_z = %10.10lf", rtklib_nav.ecef_vel.z);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[7]], LF_index[7]);
-      // ROS_INFO("data_buf = %s", data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s", data_buf);
       rtklib_nav.status.latitude = fix.latitude = atof(data_buf);
-      // ROS_INFO("latitude = %10.10lf", rtklib_nav.status.latitude);
+      if(is_debug) ROS_INFO("latitude = %10.10lf", rtklib_nav.status.latitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[8]], LF_index[8]);
-      // ROS_INFO("data_buf = %s",data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.status.longitude = fix.longitude = atof(data_buf);
-      // ROS_INFO("longitude = %10.10lf", rtklib_nav.status.longitude);
+      if(is_debug) ROS_INFO("longitude = %10.10lf", rtklib_nav.status.longitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[9]], LF_index[9]);
-      // ROS_INFO("data_buf = %s",data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s",data_buf);
       rtklib_nav.status.altitude = fix.altitude = atof(data_buf);
-      // ROS_INFO("altitude = %10.10lf",rtklib_nav.status.altitude);
+      if(is_debug) ROS_INFO("altitude = %10.10lf",rtklib_nav.status.altitude);
 
       memset(data_buf, 0, sizeof(data_buf));
       memcpy(data_buf, &recv_buf[LF_index[10]], LF_index[10]);
-      // ROS_INFO("data_buf = %s",data_buf);
+      if(is_debug) ROS_INFO("data_buf = %s",data_buf);
       if(atoi(data_buf) == 1)
       {
         rtklib_nav.status.status.status = fix.status.status = 0;
@@ -232,7 +241,7 @@ int main(int argc, char** argv)
         continue;
       }
 
-      // ROS_INFO("RAWdata:%s",recv_buf);
+      // if(is_debug) ROS_INFO("RAWdata:%s",recv_buf);
 
       pub1.publish(rtklib_nav);
       pub2.publish(fix);

@@ -98,7 +98,7 @@ int main(int argc, char** argv)
         break;
     }
 
-    if(is_debug) ROS_INFO("RAWdata:%s", recv_buf);
+    // if(is_debug) ROS_INFO("RAWdata:%s", recv_buf);
 
     if (recv_packet_size > 0)
     {
@@ -241,7 +241,7 @@ int main(int argc, char** argv)
         continue;
       }
 
-      if(is_debug) ROS_INFO("RAWdata:%s",recv_buf);
+      // if(is_debug) ROS_INFO("RAWdata:%s",recv_buf);
 
       pub1.publish(rtklib_nav);
       pub2.publish(fix);

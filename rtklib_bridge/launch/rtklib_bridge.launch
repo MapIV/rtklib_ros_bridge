@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-  <arg name="ip_adress" default="127.0.0.1"/>
+  <arg name="ip_address" default="127.0.0.1"/>
   <arg name="port" default="61111"/>
   <arg name="altitude_estimate" default="false"/>
 
-  <param name="ip_adress" value="$(arg ip_adress)"/>
-  <param name="port" value="$(arg port)"/>
-  <param name="altitude_estimate" value="$(arg altitude_estimate)"/>
-  
-  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" output="screen"/>
+  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" output="screen">
+    <param name="ip_address" value="$(arg ip_address)"/>
+    <param name="port" value="$(arg port)"/>
+    <param name="altitude_estimate" value="$(arg altitude_estimate)"/>
+  </node>
+    
 </launch>

@@ -47,20 +47,21 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "rtklib_bridge");
   ros::NodeHandle n;
+  ros::NodeHandle pnh("~");
   ros::Publisher pub1 = n.advertise<rtklib_msgs::RtklibNav>("rtklib_nav", 1);
   ros::Publisher pub2 = n.advertise<sensor_msgs::NavSatFix>("rtklib/fix", 1000);
 
   rtklib_msgs::RtklibNav rtklib_nav;
   sensor_msgs::NavSatFix fix;
 
-  std::string ip_adress = "127.0.0.1";
+  std::string ip_address = "127.0.0.1";
   int port = 61111;
   bool altitude_estimate = true;
-  n.getParam("ip_adress", ip_adress);
-  n.getParam("port", port);
-  n.getParam("altitude_estimate", altitude_estimate);
+  pnh.getParam("ip_address", ip_address);
+  pnh.getParam("port", port);
+  pnh.getParam("altitude_estimate", altitude_estimate);
 
-  std::cout << "ip_adress " << ip_adress << std::endl;
+  std::cout << "ip_address " << ip_address << std::endl;
   std::cout << "port "<< port <<std::endl;
   std::cout << "altitude_estimate " << altitude_estimate << std::endl;
 
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
 
   server.sin_family = AF_INET;
   server.sin_port = htons(port);
-  server.sin_addr.s_addr = inet_addr(ip_adress.c_str());
+  server.sin_addr.s_addr = inet_addr(ip_address.c_str());
 
   connect(sock, (struct sockaddr*)&server, sizeof(server));
 

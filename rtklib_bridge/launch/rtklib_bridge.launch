@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
+  <arg name="ip_adress" default="127.0.0.1"/>
+  <arg name="port" default="61111"/>
+  <arg name="altitude_estimate" default="false"/>
 
-  <param name="ip_adress" value="127.0.0.1"/>
-  <param name="port" value="61111"/>
-  <param name="altitude_estimate" value="false"/>
-  <!-- When outputting on ellipsoidal height (WGS 84) = false ,When outputting in altitude = true -->
-  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" respawn="true"/>
-
+  <param name="ip_adress" value="$(arg ip_adress)"/>
+  <param name="port" value="$(arg port)"/>
+  <param name="altitude_estimate" value="$(arg altitude_estimate)"/>
+  
+  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" output="screen"/>
 </launch>

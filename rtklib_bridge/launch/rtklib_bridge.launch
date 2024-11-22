@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <launch>
-
-  <param name="ip_adress" value="127.0.0.1"/>
-  <param name="port" value="61111"/>
-  <param name="altitude_estimate" value="false"/>
+  <arg name="pub_vel_topic_name" default="/rtklib_nav_doppler"/>
+  <arg name="address" default="127.0.0.1"/>
+  <arg name="port_num" default="61112"/>
+  <arg name="est_alt" default="false"/>
+  
   <!-- When outputting on ellipsoidal height (WGS 84) = false ,When outputting in altitude = true -->
-  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" respawn="true"/>
-
+  <node pkg="rtklib_bridge" name="rtklib_bridge" type="rtklib_bridge" respawn="true">
+    <param name="pub_vel_topic" value="$(arg pub_vel_topic_name)"/>
+    <param name="ip_adress" value="$(arg address)"/>
+    <param name="port" value="$(arg port_num)"/>
+    <param name="altitude_estimate" value="$(arg est_alt)"/>
+  </node>
 </launch>
+

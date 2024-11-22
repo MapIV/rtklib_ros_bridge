@@ -47,7 +47,11 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "rtklib_bridge");
   ros::NodeHandle n;
-  ros::Publisher pub1 = n.advertise<rtklib_msgs::RtklibNav>("rtklib_nav", 1);
+
+  std::string pub_vel_topic_;
+  n.param("/rtklib_bridge/pub_vel_topic", pub_vel_topic_, std::string("rtklib_nav_doppler"));
+
+  ros::Publisher pub1 = n.advertise<rtklib_msgs::RtklibNav>(pub_vel_topic_, 1);
   ros::Publisher pub2 = n.advertise<sensor_msgs::NavSatFix>("rtklib/fix", 1000);
 
   rtklib_msgs::RtklibNav rtklib_nav;
@@ -56,9 +60,9 @@ int main(int argc, char** argv)
   std::string ip_adress = "127.0.0.1";
   int port = 61111;
   bool altitude_estimate = true;
-  n.getParam("ip_adress", ip_adress);
-  n.getParam("port", port);
-  n.getParam("altitude_estimate", altitude_estimate);
+  n.getParam("/rtklib_bridge/ip_adress", ip_adress);
+  n.getParam("/rtklib_bridge/port", port);
+  n.getParam("/rtklib_bridge/altitude_estimate", altitude_estimate);
 
   std::cout << "ip_adress " << ip_adress << std::endl;
   std::cout << "port "<< port <<std::endl;

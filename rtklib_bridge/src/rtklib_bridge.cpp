@@ -238,8 +238,8 @@ int main(int argc, char** argv)
       pub1.publish(rtklib_nav);
       pub2.publish(fix);
 
-      printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n",double(rtklib_nav.tow/1000.0),
-        rtklib_nav.status.latitude,rtklib_nav.status.longitude,rtklib_nav.status.altitude);
+      // printf("GPST:%.3lf(s) latitude:%.9lf(deg)  longitude:%.9lf(deg)  altitude:%.4lf(m)\n",double(rtklib_nav.tow/1000.0),
+      //   rtklib_nav.status.latitude,rtklib_nav.status.longitude,rtklib_nav.status.altitude);
 
     }
     else if (recv_packet_size == 0)
